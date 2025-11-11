@@ -32,7 +32,7 @@ async function run() {
     //create user data on database
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
-      console.log("newProduct", newProduct);
+      newProduct.created_at = new Date();
       const result = await productCollections.insertOne(newProduct);
       res.send(result);
     });
@@ -40,7 +40,17 @@ async function run() {
     // get data on database
     app.get("/products", async (req, res) => {
       const query = req.query;
-      const cursor = productCollections.find(query);
+      const cursor = productCollections.find(query).sort({ created_at: -1 });
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // latest products
+    app.get("/latest-products", async (req, res) => {
+      const cursor = productCollections
+        .find()
+        .sort({ created_at: -1 })
+        .limit(8);
       const result = await cursor.toArray();
       res.send(result);
     });

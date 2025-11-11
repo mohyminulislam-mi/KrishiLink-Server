@@ -2,7 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 // Create app
 const app = express();
@@ -32,9 +32,16 @@ async function run() {
     //create user data on database
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
-      console.log('newProduct', newProduct);
-      
+      console.log("newProduct", newProduct);
       const result = await productCollections.insertOne(newProduct);
+      res.send(result);
+    });
+
+    // get data on database
+    app.get("/products", async (req, res) => {
+      const query = req.query;
+      const cursor = productCollections.find(query);
+      const result = await cursor.toArray();
       res.send(result);
     });
 

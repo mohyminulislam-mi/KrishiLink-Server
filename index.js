@@ -26,6 +26,18 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    const db = client.db("krishilink_DB");
+    const productCollections = db.collection("products");
+
+    //create user data on database
+    app.post("/products", async (req, res) => {
+      const newProduct = req.body;
+      console.log('newProduct', newProduct);
+      
+      const result = await productCollections.insertOne(newProduct);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("✅ Successfully connected to MongoDB!");

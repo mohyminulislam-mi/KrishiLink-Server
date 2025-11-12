@@ -72,7 +72,7 @@ async function run() {
 
     // ---------------- interests data start ----------------
     app.post("/interests", async (req, res) => {
-      const { cropId, name, email, quantity } = req.body;
+      const { cropId, name, email, quantity, units } = req.body;
 
       if (!cropId || !quantity) {
         return res.status(400).send({ message: "Missing required fields" });
@@ -83,10 +83,17 @@ async function run() {
         name,
         email,
         quantity,
+        units,
         createdAt: formattedDate,
       };
 
       const result = await interestCollections.insertOne(newInterest);
+      res.send(result);
+    });
+    // get all interests
+    app.get("/interests", async (req, res) => {
+      const cursor = interestCollections.find().sort({ createdAt: -1 });
+      const result = await cursor.toArray();
       res.send(result);
     });
 

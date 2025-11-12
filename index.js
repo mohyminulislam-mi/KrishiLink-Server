@@ -39,12 +39,25 @@ async function run() {
 
     // get data on database
     app.get("/products", async (req, res) => {
-      const query = req.query;
+      const email = req.query.ownerEmail;
+      const query = {};
+      if (email) {
+        query["owner.ownerEmail"] = email;
+      }
+
       const cursor = productCollections.find(query).sort({ created_at: -1 });
       const result = await cursor.toArray();
       res.send(result);
     });
+    //get product by id
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log("id", id);
 
+      const query = { _id: new ObjectId(id) };
+      const result = await productCollections.findOne(query);
+      res.send(result);
+    });
     // latest products
     app.get("/latest-products", async (req, res) => {
       const cursor = productCollections

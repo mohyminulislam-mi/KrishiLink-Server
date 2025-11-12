@@ -28,7 +28,9 @@ async function run() {
     await client.connect();
     const db = client.db("krishilink_DB");
     const productCollections = db.collection("products");
+    const interestCollections = db.collection("interests");
 
+    // ---------------- products data start ----------------
     //create user data on database
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
@@ -68,6 +70,27 @@ async function run() {
       res.send(result);
     });
 
+    // ---------------- interests data start ----------------
+    app.post("/interests", async (req, res) => {
+      const { cropId, name, email, quantity } = req.body;
+
+      if (!cropId || !quantity) {
+        return res.status(400).send({ message: "Missing required fields" });
+      }
+      const formattedDate = new Date().toISOString().slice(0, 10);
+      const newInterest = {
+        cropId: new ObjectId(cropId),
+        name,
+        email,
+        quantity,
+        createdAt: formattedDate,
+      };
+
+      const result = await interestCollections.insertOne(newInterest);
+      res.send(result);
+    });
+
+    // -------------------------
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("✅ Successfully connected to MongoDB!");

@@ -26,7 +26,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const db = client.db("krishilink_DB");
     const productCollections = db.collection("products");
     const interestCollections = db.collection("interests");
@@ -134,10 +134,23 @@ async function run() {
       res.send(result);
     });
 
-    
+    app.patch("/interests/:id", async (req, res) => {
+      const id = req.params.id;
+      const { status } = req.body;
+      try {
+        const result = await interestCollections.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { status: status } }
+        );
+        res.send({ success: true, result });
+      } catch (error) {
+        res.status(500).send({ error: error.message });
+      }
+    });
+
     // -------------------------
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("✅ Successfully connected to MongoDB!");
   } finally {
   }

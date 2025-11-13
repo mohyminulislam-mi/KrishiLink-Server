@@ -91,7 +91,13 @@ async function run() {
       const update = {
         $set: {
           name: updateProduct.name,
+          type: updateProduct.type,
+          quantity: updateProduct.quantity,
+          unit: updateProduct.unit,
           price: updateProduct.price,
+          description: updateProduct.description,
+          address: updateProduct.address,
+          image: updateProduct.image,
         },
       };
       const result = await productCollections.updateOne(query, update);
@@ -99,7 +105,8 @@ async function run() {
     });
     // ---------------- interests data start ----------------
     app.post("/interests", async (req, res) => {
-      const { cropId, name, email, quantity, units } = req.body;
+      const { cropId, name, email, quantity, units, message, cropTitle } =
+        req.body;
 
       if (!cropId || !quantity) {
         return res.status(400).send({ message: "Missing required fields" });
@@ -111,6 +118,9 @@ async function run() {
         email,
         quantity,
         units,
+        message,
+        cropTitle,
+        status: "pending",
         createdAt: formattedDate,
       };
 
@@ -124,6 +134,7 @@ async function run() {
       res.send(result);
     });
 
+    
     // -------------------------
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });

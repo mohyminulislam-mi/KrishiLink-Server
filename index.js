@@ -1,6 +1,7 @@
 // Import dependencies
 const express = require("express");
 const cors = require("cors");
+const dayjs = require("dayjs");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
@@ -35,13 +36,16 @@ async function run() {
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       newProduct.created_at = new Date();
+      newProduct.created_at_display = dayjs().format("MMM D, YYYY h:mm A");
       const result = await productCollections.insertOne(newProduct);
       res.send(result);
     });
 
     // get data on database
     app.get("/products", async (req, res) => {
-      const email = req.query.ownerEmail;
+      const email = req.query.email;
+      console.log(email);
+
       const query = {};
       if (email) {
         query["owner.ownerEmail"] = email;
@@ -70,6 +74,13 @@ async function run() {
       res.send(result);
     });
 
+    // delete data on database
+    app.delete("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productCollections.deleteOne(query);
+      res.send(result);
+    });
     // ---------------- interests data start ----------------
     app.post("/interests", async (req, res) => {
       const { cropId, name, email, quantity, units } = req.body;
@@ -77,7 +88,7 @@ async function run() {
       if (!cropId || !quantity) {
         return res.status(400).send({ message: "Missing required fields" });
       }
-      const formattedDate = new Date().toISOString().slice(0, 10);
+      const formattedDate = dayjs().format("MMM D, YYYY h:mm A");
       const newInterest = {
         cropId: new ObjectId(cropId),
         name,

@@ -81,6 +81,22 @@ async function run() {
       const result = await productCollections.deleteOne(query);
       res.send(result);
     });
+    // update data on database
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateProduct = req.body;
+      console.log("updateProduct", updateProduct);
+
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: {
+          name: updateProduct.name,
+          price: updateProduct.price,
+        },
+      };
+      const result = await productCollections.updateOne(query, update);
+      res.send(result);
+    });
     // ---------------- interests data start ----------------
     app.post("/interests", async (req, res) => {
       const { cropId, name, email, quantity, units } = req.body;

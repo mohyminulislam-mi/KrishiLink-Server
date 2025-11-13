@@ -129,7 +129,9 @@ async function run() {
     });
     // get all interests
     app.get("/interests", async (req, res) => {
-      const cursor = interestCollections.find().sort({ createdAt: -1 });
+      const email = req.query.email;
+      const query = { email: email };
+      const cursor = interestCollections.find(query).sort({ createdAt: -1 });
       const result = await cursor.toArray();
       res.send(result);
     });

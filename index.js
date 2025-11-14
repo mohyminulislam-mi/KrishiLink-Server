@@ -136,6 +136,16 @@ async function run() {
       res.send(result);
     });
 
+    // get all interests
+    app.get("/all-interests/:cropId", async (req, res) => {
+      const cropId = req.params.cropId;
+      const cursor = interestCollections
+        .find({ cropId: new ObjectId(cropId) })
+        .sort({ createdAt: -1 });
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     app.patch("/interests/:id", async (req, res) => {
       const id = req.params.id;
       const { status } = req.body;

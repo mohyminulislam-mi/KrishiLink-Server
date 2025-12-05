@@ -150,6 +150,15 @@ async function run() {
       const id = req.params.id;
       const { status } = req.body;
       try {
+        const interest = await interestCollections.findOne({
+          _id: new ObjectId(id),
+        });
+        await productCollections.updateOne(
+          { _id: new ObjectId(interest.cropId) },
+          {
+            $inc: { quantity: -interest.quantity },
+          }
+        );
         const result = await interestCollections.updateOne(
           { _id: new ObjectId(id) },
           { $set: { status: status } }

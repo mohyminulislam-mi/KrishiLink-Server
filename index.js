@@ -28,8 +28,41 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     const db = client.db("krishilink_DB");
+    const usersCollection = db.collection("users");
     const productCollections = db.collection("products");
     const interestCollections = db.collection("interests");
+
+    // users data into Database
+    // get user from database
+    app.get("/users", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
+      if (email) {
+        query.email = email;
+      }
+      try {
+        const cursor = usersCollection.find(query).sort({ createdAt: -1 });
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        res.send(error);
+      }
+    });
+    app.get("/users/email", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
+      if (email) {
+        query.email = email;
+      }
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+    app.get("/users/:email/role", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ role: user?.role || "user" });
+    });
 
     // ---------------- products data start ----------------
     //create user data on database
@@ -157,11 +190,11 @@ async function run() {
           { _id: new ObjectId(interest.cropId) },
           {
             $inc: { quantity: -interest.quantity },
-          }
+          },
         );
         const result = await interestCollections.updateOne(
           { _id: new ObjectId(id) },
-          { $set: { status: status } }
+          { $set: { status: status } },
         );
         res.send({ success: true, result });
       } catch (error) {
